@@ -14,10 +14,10 @@ export default function Home() {
         <div className="max-w-xl mx-auto text-center">
           <h1 className="text-3xl font-bold text-gray-900 mb-3">
             Fensterdichtungen erneuern –<br />
-            <span className="text-blue-600">Preis in 3 Minuten</span>
+            <span className="text-blue-600">Angebot in 3 Minuten</span>
           </h1>
           <p className="text-gray-500 mb-4">
-            Fotos hochladen, Maße eingeben, Preis erhalten. Kein Vor-Ort-Termin für die Ersteinschätzung nötig.
+            Fotos hochladen, Maße eingeben, Rückruf anfordern. Kein Vor-Ort-Termin für die Ersteinschätzung nötig.
           </p>
           <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
             <span>✓ Kostenlos & unverbindlich</span>
@@ -33,11 +33,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="px-4 py-6">
-        <div className="max-w-xl mx-auto text-center text-sm text-gray-400">
-          <p>Typische Preise: 200–300 € pro Fenster inkl. Montage • Anfahrt 50 € bei kleinen Aufträgen</p>
-        </div>
-      </section>
     </main>
   );
 }

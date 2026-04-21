@@ -152,24 +152,13 @@ export default function Step3Items({ defaultCondition, onNext }: Props) {
         </div>
       </div>
 
-      {totalSealMeters < 100 && (
-        <div className="bg-orange-50 border border-orange-100 rounded-xl px-4 py-3 text-sm text-orange-700 mb-4">
-          ⚠ Gesamt {totalSealMeters.toFixed(1)} m Dichtung — unter 100 m: Mindermengenzuschlag +100 € (einmalig)
-        </div>
-      )}
-      {totalSealMeters >= 100 && (
-        <div className="bg-green-50 border border-green-100 rounded-xl px-4 py-3 text-sm text-green-700 mb-4">
-          ✓ Gesamt {totalSealMeters.toFixed(1)} m Dichtung — kein Mindermengenzuschlag
-        </div>
-      )}
-
       {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
 
       <button
         onClick={() => { if (validate()) onNext(items); }}
         className="w-full py-4 rounded-xl bg-blue-600 text-white font-bold text-lg hover:bg-blue-700 transition-colors"
       >
-        Preis berechnen ({items.length} {items.length === 1 ? 'Position' : 'Positionen'}) →
+        Weiter ({items.length} {items.length === 1 ? 'Position' : 'Positionen'}) →
       </button>
     </div>
   );
