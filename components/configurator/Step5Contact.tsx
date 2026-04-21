@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { calculatePrice, LineItem } from '@/lib/pricing'; // calculatePrice used for lead data only
+import { calculatePrice, LineItem } from '@/lib/pricing';
 import { AiResult } from './Step2Analysis';
 import { PhotoBundle } from './Step1Photos';
 
@@ -12,6 +12,20 @@ interface Props {
   onDone: () => void;
 }
 
+
+function SavingsBanner({ items }: { items: LineItem[] }) {
+  const p = calculatePrice(items);
+  if (p.ersparnis <= 0) return null;
+  return (
+    <div className="bg-green-600 rounded-2xl px-5 py-4 mb-6 text-white text-center">
+      <p className="text-sm font-medium text-green-100 mb-1">Im Vergleich zu neuen Fenstern sparen Sie ca.</p>
+      <p className="text-4xl font-extrabold">
+        {p.ersparnis.toLocaleString('de-DE', { maximumFractionDigits: 0 })} €
+      </p>
+      <p className="text-xs text-green-200 mt-2">* Grobe Schätzung – genaues Angebot nach Aufmaß-Termin</p>
+    </div>
+  );
+}
 
 export default function Step5Contact({ aiResult, items, bundle, onDone }: Props) {
   const [name, setName] = useState('');
@@ -59,6 +73,7 @@ export default function Step5Contact({ aiResult, items, bundle, onDone }: Props)
 
   return (
     <div>
+      <SavingsBanner items={items} />
       <h2 className="text-2xl font-bold text-gray-800 mb-2">Rückruf anfordern</h2>
       <p className="text-gray-500 mb-6">
         Wir rufen Sie persönlich an und besprechen Ihr individuelles Angebot.
