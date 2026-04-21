@@ -36,8 +36,8 @@ export default function Step5Contact({ aiResult, items, bundle, onDone }: Props)
       fd.append('seal_color', aiResult.sealColor ?? '');
       fd.append('seal_color_hex', aiResult.sealColorHex ?? '');
       fd.append('ai_notes', aiResult.notes ?? '');
-      fd.append('total_price', price.total.toFixed(2));
-      fd.append('travel_fee', price.travelFee.toFixed(2));
+      fd.append('total_price', price.bruttoGesamt.toFixed(2));
+      fd.append('travel_fee', price.anfahrt.toFixed(2));
       fd.append('items', JSON.stringify(items.map((i) => ({
         label: i.label, widthCm: i.widthCm, heightCm: i.heightCm,
         condition: i.condition, perimeter: ((i.widthCm * 2 + i.heightCm * 2) / 100).toFixed(1),

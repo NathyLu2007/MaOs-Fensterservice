@@ -1,6 +1,6 @@
 'use client';
 
-import { calculatePrice, LineItem, PRICE_PER_WINDOW, PRICE_PER_METER } from '@/lib/pricing';
+import { calculatePrice, LineItem, MWST_SATZ, NEUFENSTER_FAKTOR, HAUSTUER_FAKTOR } from '@/lib/pricing';
 
 interface Props {
   items: LineItem[];
@@ -8,54 +8,115 @@ interface Props {
   onDecline: () => void;
 }
 
+function eur(n: number) {
+  return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
+
 export default function Step4Price({ items, onAccept, onDecline }: Props) {
-  const price = calculatePrice(items);
+  const p = calculatePrice(items);
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-800 mb-2">Ihre Beispielrechnung</h2>
-      <p className="text-gray-500 mb-4">Das ist eine unverbindliche Schätzung. Das genaue Angebot erhalten Sie nach telefonischer Rücksprache.</p>
+      <h2 className="text-2xl font-bold text-gray-800 mb-2">Ihre Preisübersicht</h2>
+      <p className="text-gray-500 mb-4 text-sm">Unverbindliche Schätzung — das genaue Angebot nach telefonischer Rücksprache.</p>
 
       <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 mb-5">
-        ℹ️ <strong>Hinweis:</strong> Diese Berechnung ist kein verbindliches Angebot. Wir melden uns telefonisch bei Ihnen.
+        ℹ️ <strong>Hinweis:</strong> Diese Berechnung ist kein verbindliches Angebot.
       </div>
 
-      <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-6 text-white mb-5">
-        <p className="text-blue-200 text-sm mb-1">Beispielpreis (unverbindlich)</p>
-        <p className="text-4xl font-bold mb-1">
-          {price.totalMin} – {price.totalMax} €
-        </p>
-        <p className="text-blue-200 text-sm">inkl. Materialkosten & Montage</p>
-      </div>
-
-      <div className="bg-gray-50 rounded-xl p-4 mb-5 text-sm space-y-2">
+      {/* Positionen */}
+      <div className="bg-gray-50 rounded-xl p-4 mb-4 text-sm space-y-2">
         <p className="font-semibold text-gray-700 mb-2">Positionen:</p>
-        {price.items.map(({ item, price: p, perimeter }, i) => (
-          <div key={item.id} className="text-gray-600 py-1 border-b border-gray-100 last:border-0">
+        {p.itemPrices.map(({ item, perimeterM, sealMeters, materialCost }, i) => (
+          <div key={item.id} className="text-gray-600 py-1.5 border-b border-gray-100 last:border-0">
             <div className="flex justify-between">
               <span className="font-medium">{i + 1}. {item.label}</span>
-              <span className="font-semibold">{p.toFixed(0)} €</span>
+              <span className="font-semibold">{eur(materialCost)}</span>
             </div>
             <div className="text-xs text-gray-400 mt-0.5">
-              {item.widthCm}×{item.heightCm} cm · {perimeter} m Umfang · {item.condition}
-              {' · '}{PRICE_PER_WINDOW} € + {perimeter} m × {PRICE_PER_METER} €/m
+              {item.widthCm}×{item.heightCm} cm · {perimeterM.toFixed(1)} m Umfang ·{' '}
+              {item.sealCount}× Dichtung = {sealMeters.toFixed(1)} m ·{' '}
+              {item.condition}
             </div>
           </div>
         ))}
-        <hr className="my-2" />
+      </div>
+
+      {/* Kostenaufstellung */}
+      <div className="bg-white border border-gray-200 rounded-xl p-4 mb-4 text-sm space-y-2">
+        <p className="font-semibold text-gray-700 mb-2">
+          Kostenaufstellung <span className="font-normal text-gray-400">({p.totalSealMeters.toFixed(1)} m Dichtung gesamt)</span>
+        </p>
+
         <div className="flex justify-between text-gray-600">
-          <span>Zwischensumme</span>
-          <span>{price.subtotal.toFixed(0)} €</span>
+          <span>Material & Montage</span>
+          <span>{eur(p.sumMaterialCost)}</span>
         </div>
-        {price.travelFee > 0 && (
+
+        <div className="flex justify-between text-gray-600">
+          <span>Regiestunde Mehraufwand ({items.length}× {eur(13)})</span>
+          <span>{eur(p.sumRegiestunde)}</span>
+        </div>
+
+        <div className="flex justify-between text-gray-600">
+          <span>Anfahrt</span>
+          <span>{eur(p.anfahrt)}</span>
+        </div>
+
+        {p.mindermengenZuschlag > 0 && (
           <div className="flex justify-between text-orange-600">
-            <span>Anfahrtspauschale</span>
-            <span>+ {price.travelFee} €</span>
+            <span>Mindermengenzuschlag (&lt; 100 m)</span>
+            <span>+ {eur(p.mindermengenZuschlag)}</span>
           </div>
         )}
+
+        <div className="flex justify-between text-gray-600 border-t pt-2 mt-1">
+          <span>Netto</span>
+          <span>{eur(p.nettoGesamt)}</span>
+        </div>
+
+        <div className="flex justify-between text-gray-500">
+          <span>MwSt. {Math.round(MWST_SATZ * 100)} %</span>
+          <span>{eur(p.mwst)}</span>
+        </div>
+
         <div className="flex justify-between font-bold text-base border-t pt-2">
-          <span>Gesamt (ca.)</span>
-          <span>{price.total.toFixed(0)} €</span>
+          <span>Gesamtpreis (brutto)</span>
+          <span className="text-blue-700">{eur(p.bruttoGesamt)}</span>
+        </div>
+      </div>
+
+      {/* Vergleich neue Fenster */}
+      <div className="rounded-2xl overflow-hidden mb-5 border-2 border-green-200">
+        <div className="bg-green-600 px-4 py-2.5 text-white text-sm font-bold flex items-center gap-2">
+          💡 Vergleich: Was würden neue Fenster kosten?
+        </div>
+        <div className="bg-green-50 p-4 space-y-2 text-sm">
+          <p className="text-gray-500 text-xs mb-3">
+            Neue Fenster kosten ca. {NEUFENSTER_FAKTOR}× unseren Preis, eine Haustür ca. {HAUSTUER_FAKTOR}×.
+          </p>
+
+          {p.itemPrices.map(({ item, newWindowBrutto }, i) => (
+            <div key={item.id} className="flex justify-between text-gray-600">
+              <span>{i + 1}. Neues {item.label}</span>
+              <span>{eur(newWindowBrutto)}</span>
+            </div>
+          ))}
+
+          <div className="flex justify-between font-semibold text-gray-700 border-t pt-2">
+            <span>Neue Fenster gesamt</span>
+            <span>{eur(p.neufensterGesamt)}</span>
+          </div>
+
+          <div className="flex justify-between font-semibold text-gray-500">
+            <span>Ihr Preis (Abdichtung)</span>
+            <span>− {eur(p.bruttoGesamt)}</span>
+          </div>
+
+          <div className="bg-green-600 rounded-xl px-4 py-3 flex justify-between items-center mt-2">
+            <span className="text-white font-bold text-base">💰 Sie sparen</span>
+            <span className="text-white font-extrabold text-xl">{eur(p.ersparnis)}</span>
+          </div>
         </div>
       </div>
 

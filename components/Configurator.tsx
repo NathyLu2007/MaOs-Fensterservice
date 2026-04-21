@@ -55,7 +55,7 @@ export default function Configurator() {
       {step === 3 && aiResult && (
         <Step3Items
           defaultCondition={aiResult.condition}
-          onNext={(i) => { setItems(i); track('items_done', 3, { count: i.length }); setStep(4); }}
+onNext={(i) => { setItems(i); track('items_done', 3, { count: i.length }); setStep(4); }}
         />
       )}
       {step === 4 && (

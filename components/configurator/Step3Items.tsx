@@ -14,7 +14,7 @@ function newId() { return String(++idCounter); }
 
 function createItem(type: string, condition: string): LineItem {
   const def = ITEM_TYPES.find((t) => t.value === type) ?? ITEM_TYPES[0];
-  return { id: newId(), type, label: def.label, widthCm: def.defaultW, heightCm: def.defaultH, condition };
+  return { id: newId(), type, label: def.label, widthCm: def.defaultW, heightCm: def.defaultH, condition, sealCount: 1 };
 }
 
 export default function Step3Items({ defaultCondition, onNext }: Props) {
@@ -42,6 +42,11 @@ export default function Step3Items({ defaultCondition, onNext }: Props) {
     return true;
   }
 
+  const totalSealMeters = items.reduce((sum, item) => {
+    const perimeterM = (item.widthCm * 2 + item.heightCm * 2) / 100;
+    return sum + perimeterM * item.sealCount;
+  }, 0);
+
   const CONDITIONS = [
     { value: 'gut', label: 'Gut' },
     { value: 'porös', label: 'Porös' },
@@ -66,6 +71,25 @@ export default function Step3Items({ defaultCondition, onNext }: Props) {
                   <Trash2 size={16} />
                 </button>
               )}
+            </div>
+
+            {/* Anzahl Dichtungen */}
+            <div className="mb-3">
+              <label className="text-xs font-medium text-gray-500 mb-1 block">Anzahl Dichtungen</label>
+              <div className="grid grid-cols-3 gap-2">
+                {([1, 2, 3] as const).map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => update(item.id, 'sealCount', n)}
+                    className={`py-2 px-2 rounded-lg border-2 text-sm font-medium transition-colors
+                      ${item.sealCount === n
+                        ? 'border-blue-600 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}
+                  >
+                    {n}× Dichtung
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-3">
@@ -101,6 +125,13 @@ export default function Step3Items({ defaultCondition, onNext }: Props) {
                 ))}
               </select>
             </div>
+
+            <div className="mt-2 text-xs text-gray-400">
+              {(() => {
+                const per = (item.widthCm * 2 + item.heightCm * 2) / 100;
+                return `${per.toFixed(1)} m Umfang × ${item.sealCount} = ${(per * item.sealCount).toFixed(1)} m Dichtung`;
+              })()}
+            </div>
           </div>
         ))}
       </div>
@@ -121,9 +152,14 @@ export default function Step3Items({ defaultCondition, onNext }: Props) {
         </div>
       </div>
 
-      {items.length <= 2 && (
+      {totalSealMeters < 100 && (
         <div className="bg-orange-50 border border-orange-100 rounded-xl px-4 py-3 text-sm text-orange-700 mb-4">
-          ⚠ Bei 1–2 Positionen fällt eine Anfahrtspauschale von 50 € an.
+          ⚠ Gesamt {totalSealMeters.toFixed(1)} m Dichtung — unter 100 m: Mindermengenzuschlag +100 € (einmalig)
+        </div>
+      )}
+      {totalSealMeters >= 100 && (
+        <div className="bg-green-50 border border-green-100 rounded-xl px-4 py-3 text-sm text-green-700 mb-4">
+          ✓ Gesamt {totalSealMeters.toFixed(1)} m Dichtung — kein Mindermengenzuschlag
         </div>
       )}
 
