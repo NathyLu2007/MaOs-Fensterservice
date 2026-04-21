@@ -85,7 +85,7 @@ export default function Step2Analysis({ bundle, onNext }: Props) {
     );
   }
 
-  const canProceed = windowType && condition && sealProfile && profileConfirmed && sealColor;
+  const canProceed = windowType && condition && sealColor;
 
   return (
     <div className="space-y-5">
@@ -145,9 +145,10 @@ export default function Step2Analysis({ bundle, onNext }: Props) {
       <div className="bg-gray-50 rounded-2xl p-4">
         <label className="block text-sm font-semibold text-gray-700 mb-1">
           Dichtungsprofil
+          <span className="ml-2 text-xs font-normal text-gray-400">(optional)</span>
           {aiRaw?.profileConfidence ? <span className="ml-2 text-xs font-normal text-gray-400">KI: {aiRaw.profileConfidence}% sicher</span> : null}
         </label>
-        <p className="text-xs text-gray-400 mb-3">Anhand Ihrer Nahaufnahme erkannt – bitte bestätigen.</p>
+        <p className="text-xs text-gray-400 mb-3">Falls bekannt – wir klären das auch gerne vor Ort.</p>
         <div className="grid grid-cols-2 gap-2 mb-3">
           {SEAL_PROFILES.map((p) => (
             <button key={p} onClick={() => { setSealProfile(p); setProfileConfirmed(false); }}
@@ -221,7 +222,7 @@ export default function Step2Analysis({ bundle, onNext }: Props) {
       </button>
       {!canProceed && (
         <p className="text-center text-xs text-gray-400">
-          {!profileConfirmed && sealProfile ? 'Profil bestätigen' : !sealColor ? 'Farbe auswählen' : 'Alle Felder ausfüllen'}
+          {!sealColor ? 'Farbe auswählen' : 'Bitte Fenstertyp und Zustand auswählen'}
         </p>
       )}
     </div>
