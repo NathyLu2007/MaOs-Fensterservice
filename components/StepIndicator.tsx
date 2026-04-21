@@ -1,6 +1,6 @@
 'use client';
 
-const STEPS = ['Fotos', 'Analyse', 'Maße', 'Preis', 'Kontakt'];
+const STEPS = ['Fotos', 'Analyse', 'Maße', 'Kontakt'];
 
 export default function StepIndicator({ current }: { current: number }) {
   return (

@@ -12,6 +12,24 @@ interface Props {
   onDone: () => void;
 }
 
+function SavingsBanner({ items }: { items: LineItem[] }) {
+  const p = calculatePrice(items);
+  if (p.ersparnis <= 0) return null;
+  return (
+    <div className="bg-green-600 rounded-2xl px-5 py-4 mb-6 text-white">
+      <p className="text-sm font-medium text-green-100 mb-1">Neue Fenster würden ca. kosten:</p>
+      <p className="text-2xl font-bold line-through text-green-200 mb-1">
+        {p.neufensterGesamt.toLocaleString('de-DE', { maximumFractionDigits: 0 })} €
+      </p>
+      <p className="text-sm font-medium text-green-100 mb-0.5">Mit Abdichtung sparen Sie ca.:</p>
+      <p className="text-3xl font-extrabold">
+        {p.ersparnis.toLocaleString('de-DE', { maximumFractionDigits: 0 })} €
+      </p>
+      <p className="text-xs text-green-200 mt-2">* Grobe Schätzung. Genaues Angebot nach Aufmaß-Termin.</p>
+    </div>
+  );
+}
+
 export default function Step5Contact({ aiResult, items, bundle, onDone }: Props) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -58,6 +76,7 @@ export default function Step5Contact({ aiResult, items, bundle, onDone }: Props)
 
   return (
     <div>
+      <SavingsBanner items={items} />
       <h2 className="text-2xl font-bold text-gray-800 mb-2">Rückruf anfordern</h2>
       <p className="text-gray-500 mb-6">
         Wir rufen Sie persönlich an und besprechen Ihr individuelles Angebot.
